@@ -1,0 +1,2033 @@
+!DOCTYPE html
+html lang=en class=dark
+head
+    meta charset=UTF-8
+    meta name=viewport content=width=device-width, initial-scale=1.0
+    titleEngiQuest  Spin & Collect Academic RPGtitle
+    !-- Tailwind CSS --
+    script src=httpscdn.tailwindcss.comscript
+    !-- Font Awesome Icons --
+    link rel=stylesheet href=httpscdnjs.cloudflare.comcssall.min.css
+    link rel=stylesheet href=httpscdnjs.cloudflare.comajaxlibsfont-awesome6.5.1cssall.min.css
+    !-- Google Fonts Inter & JetBrains Mono --
+    link href=httpsfonts.googleapis.comcss2family=Interwght@300;400;500;600;700;800;900&family=JetBrains+Monowght@500;600;700;800&display=swap rel=stylesheet
+    
+    script
+        tailwind.config = {
+            darkMode 'class',
+            theme {
+                extend {
+                    fontFamily {
+                        sans ['Inter', 'sans-serif'],
+                        mono ['JetBrains Mono', 'monospace'],
+                    },
+                    colors {
+                        slate {
+                            850 '#151e32',
+                            950 '#070b14',
+                        }
+                    }
+                }
+            }
+        }
+    script
+
+    style
+        body {
+            background-color #070b14;
+            color #f1f5f9;
+            overflow-x hidden;
+        }
+
+        .bg-grid-pattern {
+            background-image radial-gradient(rgba(99, 102, 241, 0.13) 1px, transparent 1px);
+            background-size 24px 24px;
+        }
+
+         Floating +PTS Animation 
+        @keyframes floatUpFade {
+            0% { opacity 1; transform translateY(0) scale(0.9); }
+            40% { opacity 1; transform translateY(-28px) scale(1.1); }
+            100% { opacity 0; transform translateY(-65px) scale(0.95); }
+        }
+
+        .floating-xp {
+            position fixed;
+            pointer-events none;
+            z-index 9999;
+            animation floatUpFade 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+         Shimmer effect for Pack Progress Bar 
+        @keyframes shimmer {
+            0% { background-position -200% 0; }
+            100% { background-position 200% 0; }
+        }
+
+        .pack-bar-fill {
+            background linear-gradient(90deg, #f59e0b 0%, #ec4899 50%, #6366f1 100%);
+            background-size 200% 100%;
+            animation shimmer 3.5s infinite linear;
+            transition width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+         Trading Card 3D & Foil Styles 
+        .perspective-1000 {
+            perspective 1000px;
+        }
+
+        .card-inner {
+            transition transform 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style preserve-3d;
+        }
+
+        .card-flipped {
+            transform rotateY(180deg);
+        }
+
+        .backface-hidden {
+            backface-visibility hidden;
+            -webkit-backface-visibility hidden;
+        }
+
+        .rotate-y-180 {
+            transform rotateY(180deg);
+        }
+
+         Legendary Holographic Foil Animation 
+        @keyframes holoGradient {
+            0% { background-position 0% 50%; }
+            50% { background-position 100% 50%; }
+            100% { background-position 0% 50%; }
+        }
+
+        .rarity-legendary-card {
+            background linear-gradient(135deg, #fbbf24, #f43f5e, #a855f7, #06b6d4, #fbbf24);
+            background-size 300% 300%;
+            animation holoGradient 4s ease infinite;
+        }
+
+        .collectible-card {
+            transition all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .collectible-cardhover {
+            transform translateY(-5px) scale(1.015);
+        }
+
+         Custom Scrollbar 
+        -webkit-scrollbar { width 8px; height 8px; }
+        -webkit-scrollbar-track { background #0f172a; }
+        -webkit-scrollbar-thumb { background #334155; border-radius 9999px; }
+        -webkit-scrollbar-thumbhover { background #475569; }
+    style
+head
+body class=min-h-screen bg-grid-pattern antialiased selectionbg-indigo-500 selectiontext-white pb-20
+
+    !-- Top Navigation & Pack Progress Header --
+    header class=sticky top-0 z-30 backdrop-blur-xl bg-slate-95090 border-b border-slate-80080 shadow-lg
+        div class=max-w-7xl mx-auto px-4 smpx-6 lgpx-8 py-3.5
+            div class=flex flex-col lgflex-row lgitems-center lgjustify-between gap-4
+                
+                !-- Brand & Sync Status --
+                div class=flex items-center justify-between
+                    div class=flex items-center gap-3.5
+                        div class=relative
+                            div class=w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 via-pink-500 to-indigo-600 p-0.5 shadow-lg shadow-indigo-50020
+                                div class=w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center
+                                    i class=fa-solid fa-dice-d20 text-xl text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-pink-400i
+                                div
+                            div
+                            span id=collectorRankBadge class=absolute -bottom-1.5 -right-1.5 px-1.5 py-0.5 text-[10px] font-mono font-bold bg-indigo-600 text-white rounded-md border border-slate-950 shadow
+                                LVL 1
+                            span
+                        div
+                        div
+                            div class=flex items-center gap-2
+                                h1 class=text-lg smtext-xl font-extrabold tracking-tight text-whiteEngiQuesth1
+                                span id=syncStatusBadge class=text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-50015 text-emerald-300 border border-emerald-50030 flex items-center gap-1
+                                    span class=w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulsespan
+                                    spanAuto-Savedspan
+                                span
+                            div
+                            p class=text-xs text-slate-400 mt-0.53-Tier Wheel Spins & Collectible Card Binderp
+                        div
+                    div
+
+                    !-- Mobile Utility Buttons --
+                    div class=flex items-center gap-2 lghidden
+                        button onclick=openBackupModal() class=p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hovertext-white transition title=Save  Export Backup
+                            i class=fa-solid fa-cloud-arrow-down text-smi
+                        button
+                        button id=soundToggleMobile onclick=toggleSound() class=p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hovertext-white transition title=Toggle Sound
+                            i class=fa-solid fa-volume-high text-smi
+                        button
+                    div
+                div
+
+                !-- 100-Point Card Pack Progress Bar (Center) --
+                div class=flex-1 max-w-xl w-full lgmx-4 bg-slate-90095 border border-slate-800 rounded-2xl p-3 shadow-inner
+                    div class=flex justify-between items-center text-xs mb-1.5
+                        span class=font-semibold text-slate-200 flex items-center gap-1.5
+                            i class=fa-solid fa-layer-group text-amber-400i
+                            spanNext Card Pack Meterspan
+                        span
+                        span class=font-mono text-slate-300
+                            span id=packProgressText class=text-amber-400 font-bold0span  100 PTS
+                            span id=packsReadyPill class=ml-1.5 px-2 py-0.5 rounded-md bg-amber-50020 text-amber-300 border border-amber-50040 font-bold
+                                0 Packs Ready
+                            span
+                        span
+                    div
+                    div class=w-full h-3 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-800
+                        div id=packProgressBar class=h-full rounded-full pack-bar-fill style=width 0%div
+                    div
+                div
+
+                !-- Right Action Pills & Quick Pack Draw --
+                div class=flex items-center justify-between smjustify-end gap-2.5
+                    !-- Spendable Points Balance --
+                    div class=flex items-center gap-2.5 bg-slate-90090 border border-amber-50030 rounded-2xl px-3.5 py-2
+                        div class=w-8 h-8 rounded-xl bg-amber-50015 flex items-center justify-center text-amber-400
+                            i class=fa-solid fa-coinsi
+                        div
+                        div
+                            div class=text-[10px] uppercase tracking-wider text-slate-400 font-semiboldPoint Bankdiv
+                            div id=availablePointsHeader class=text-sm smtext-base font-mono font-bold text-amber-4000 PTSdiv
+                        div
+                    div
+
+                    !-- Cards Collected Counter --
+                    div class=flex items-center gap-2.5 bg-slate-90090 border border-indigo-50030 rounded-2xl px-3.5 py-2
+                        div class=w-8 h-8 rounded-xl bg-indigo-50015 flex items-center justify-center text-indigo-400
+                            i class=fa-solid fa-id-card-clipi
+                        div
+                        div
+                            div class=text-[10px] uppercase tracking-wider text-slate-400 font-semiboldBinderdiv
+                            div id=binderCountHeader class=text-sm smtext-base font-mono font-bold text-indigo-3000  20div
+                        div
+                    div
+
+                    !-- Open Pack CTA Button --
+                    button onclick=switchMainTab('pack-opening') id=headerDrawPackBtn
+                        class=px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 via-pink-500 to-indigo-600 hoverfrom-amber-400 hoverto-indigo-500 text-white font-bold text-xs smtext-sm shadow-lg shadow-pink-50020 activescale-95 transition flex items-center gap-2
+                        i class=fa-solid fa-sparklesi
+                        spanDraw Cardspan
+                        span id=headerPackBadge class=px-1.5 py-0.5 text-[10px] font-mono bg-slate-95070 rounded-md0span
+                    button
+
+                    !-- Desktop Utility Buttons --
+                    div class=hidden lgflex items-center gap-1.5
+                        button onclick=openBackupModal() class=p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hovertext-cyan-400 hoverborder-slate-700 transition title=Standalone Setup & Backup
+                            i class=fa-solid fa-cloud-arrow-down text-smi
+                        button
+                        button id=soundToggleDesktop onclick=toggleSound() class=p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hovertext-white hoverborder-slate-700 transition title=Toggle Sound Effects
+                            i class=fa-solid fa-volume-high text-smi
+                        button
+                        button onclick=openResetModal() class=p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hovertext-rose-400 hoverborder-slate-700 transition title=Reset Demo Data
+                            i class=fa-solid fa-rotate-right text-smi
+                        button
+                    div
+                div
+
+            div
+
+            !-- Main Navigation Tabs --
+            div class=flex items-center gap-2 mt-4 pt-3 border-t border-slate-80080 overflow-x-auto no-scrollbar
+                button onclick=switchMainTab('quests') id=tabBtn-quests
+                    class=tab-nav-btn px-4 py-2 rounded-xl text-xs smtext-sm font-bold transition flex items-center gap-2 bg-indigo-600 text-white shadow-lg shadow-indigo-60025 shrink-0
+                    i class=fa-solid fa-dharmachakrai
+                    spanAssignments & Spin Wheelsspan
+                button
+                button onclick=switchMainTab('pack-opening') id=tabBtn-pack-opening
+                    class=tab-nav-btn px-4 py-2 rounded-xl text-xs smtext-sm font-bold transition flex items-center gap-2 bg-slate-900 text-slate-400 hovertext-white border border-slate-800 shrink-0
+                    i class=fa-solid fa-wand-magic-sparkles text-amber-400i
+                    spanCard Pack Summon (100 PTS)span
+                button
+                button onclick=switchMainTab('binder') id=tabBtn-binder
+                    class=tab-nav-btn px-4 py-2 rounded-xl text-xs smtext-sm font-bold transition flex items-center gap-2 bg-slate-900 text-slate-400 hovertext-white border border-slate-800 shrink-0
+                    i class=fa-solid fa-book-open text-cyan-400i
+                    spanCard Collection Binderspan
+                button
+                button onclick=switchMainTab('deck-studio') id=tabBtn-deck-studio
+                    class=tab-nav-btn px-4 py-2 rounded-xl text-xs smtext-sm font-bold transition flex items-center gap-2 bg-slate-900 text-slate-400 hovertext-white border border-slate-800 shrink-0
+                    i class=fa-solid fa-sliders text-pink-400i
+                    spanDeck & Rarity Odds Studiospan
+                button
+            div
+        div
+    header
+
+    !-- ========================================== --
+    !-- MAIN CONTENT CONTAINER                     --
+    !-- ========================================== --
+    main class=max-w-7xl mx-auto px-4 smpx-6 lgpx-8 pt-6
+
+        !-- TAB 1 ASSIGNMENTS & 3-TIER WHEEL SPINS --
+        div id=tabPanel-quests class=grid grid-cols-1 lggrid-cols-12 gap-6 items-start
+            
+            !-- Left 7 Cols Add Assignment & Active Assignments List --
+            div class=lgcol-span-7 space-y-6
+                
+                !-- Quick-Add Assignment with 3 Wheel Tiers --
+                section class=bg-slate-90090 backdrop-blur-md border border-slate-800 rounded-2xl p-5 shadow-xl
+                    div class=flex items-center justify-between mb-4
+                        div class=flex items-center gap-2.5
+                            span class=w-8 h-8 rounded-xl bg-indigo-50020 text-indigo-400 flex items-center justify-center text-sm
+                                i class=fa-solid fa-plusi
+                            span
+                            div
+                                h2 class=text-base font-bold text-white tracking-tightAdd Coursework Assignmenth2
+                                p class=text-xs text-slate-400Select one of the 3 Wheel Tiers to determine your spin payoutp
+                            div
+                        div
+                    div
+
+                    form id=addQuestForm onsubmit=handleAddQuest(event) class=space-y-4
+                        div class=grid grid-cols-1 smgrid-cols-12 gap-3.5
+                            div class=smcol-span-7
+                                label class=block text-xs font-medium text-slate-400 mb-1Assignment  Project  Exam Titlelabel
+                                input type=text id=questTitle required placeholder=e.g., Laplace Transforms Problem Set 6
+                                    class=w-full bg-slate-950 border border-slate-800 focusborder-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition
+                            div
+
+                            div class=smcol-span-5
+                                label class=block text-xs font-medium text-slate-400 mb-1Course  Domainlabel
+                                select id=questCourse
+                                    class=w-full bg-slate-950 border border-slate-800 focusborder-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition
+                                    option value=APMA 2130APMA 2130 (Diff Eq)option
+                                    option value=MAE 2040MAE 2040 (CAD  Design)option
+                                    option value=ECE 2200ECE 2200 (Applied PhysicsCircuits)option
+                                    option value=STS 2600STS 2600 (Engineering Ethics)option
+                                    option value=MAE 2020MAE 2020 (Thermodynamics)option
+                                    option value=StaticsStatics (Mechanics I)option
+                                    option value=MARS RoverMARS Rover Teamoption
+                                    option value=GeneralGeneral  Personaloption
+                                select
+                            div
+                        div
+
+                        !-- 3-Tier Assignment Selector Cards --
+                        div
+                            label class=block text-xs font-medium text-slate-400 mb-2Select Assignment Wheel Tierlabel
+                            div class=grid grid-cols-1 smgrid-cols-3 gap-3 id=tierRadioGroup
+                                !-- Tier 1 5-25 PTS --
+                                label onclick=selectFormTier(1) id=tierCard-1
+                                    class=cursor-pointer rounded-xl p-3 border-2 border-emerald-500 bg-emerald-50010 transition flex flex-col justify-between
+                                    input type=radio name=questTier value=1 checked class=hidden
+                                    div class=flex items-center justify-between
+                                        span class=text-xs font-bold text-emerald-300 uppercase tracking-widerTier 1 • Lowspan
+                                        i class=fa-solid fa-dharmachakra text-emerald-400i
+                                    div
+                                    div class=my-1.5 text-lg font-mono font-extrabold text-white5 – 25 PTSdiv
+                                    p class=text-[11px] text-slate-400Quick homework, daily reading, or short study blockp
+                                label
+
+                                !-- Tier 2 20-50 PTS --
+                                label onclick=selectFormTier(2) id=tierCard-2
+                                    class=cursor-pointer rounded-xl p-3 border-2 border-slate-800 bg-slate-95080 hoverborder-slate-700 transition flex flex-col justify-between
+                                    input type=radio name=questTier value=2 class=hidden
+                                    div class=flex items-center justify-between
+                                        span class=text-xs font-bold text-cyan-300 uppercase tracking-widerTier 2 • Mediumspan
+                                        i class=fa-solid fa-dharmachakra text-cyan-400i
+                                    div
+                                    div class=my-1.5 text-lg font-mono font-extrabold text-white20 – 50 PTSdiv
+                                    p class=text-[11px] text-slate-400Full problem set, lab report, CAD assembly, or quizp
+                                label
+
+                                !-- Tier 3 50-100 PTS --
+                                label onclick=selectFormTier(3) id=tierCard-3
+                                    class=cursor-pointer rounded-xl p-3 border-2 border-slate-800 bg-slate-95080 hoverborder-slate-700 transition flex flex-col justify-between
+                                    input type=radio name=questTier value=3 class=hidden
+                                    div class=flex items-center justify-between
+                                        span class=text-xs font-bold text-amber-300 uppercase tracking-widerTier 3 • Majorspan
+                                        i class=fa-solid fa-dharmachakra text-amber-400i
+                                    div
+                                    div class=my-1.5 text-lg font-mono font-extrabold text-white50 – 100 PTSdiv
+                                    p class=text-[11px] text-slate-400Midterm exam, major project milestone, or CSWA prepp
+                                label
+                            div
+                        div
+
+                        div class=grid grid-cols-1 smgrid-cols-12 gap-3.5 items-end pt-1
+                            div class=smcol-span-6
+                                label class=block text-xs font-medium text-slate-400 mb-1Due Datelabel
+                                input type=date id=questDueDate required
+                                    class=w-full bg-slate-950 border border-slate-800 focusborder-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 outline-none transition
+                            div
+                            div class=smcol-span-6
+                                button type=submit
+                                    class=w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hoverfrom-indigo-500 hoverto-cyan-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg shadow-indigo-60025 activescale-[0.99] transition flex items-center justify-center gap-2 text-sm
+                                    i class=fa-solid fa-plus-circlei
+                                    spanAdd Assignment to Queuespan
+                                button
+                            div
+                        div
+                    form
+                section
+
+                !-- Active Assignments List --
+                section class=bg-slate-90090 backdrop-blur-md border border-slate-800 rounded-2xl p-5 shadow-xl
+                    div class=flex flex-col smflex-row smitems-center justify-between gap-3 pb-4 border-b border-slate-800
+                        div class=flex items-center gap-2.5
+                            span class=w-8 h-8 rounded-xl bg-cyan-50020 text-cyan-400 flex items-center justify-center text-sm
+                                i class=fa-solid fa-list-checki
+                            span
+                            div
+                                div class=flex items-center gap-2
+                                    h2 class=text-base font-bold text-whiteActive Assignmentsh2
+                                    span id=activeQuestCount class=text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 text-cyan-4000span
+                                div
+                                p class=text-xs text-slate-400Click Complete & Spin to launch that assignment's Point Wheelp
+                            div
+                        div
+
+                        div class=flex items-center gap-2
+                            select id=filterCourse onchange=renderActiveQuests()
+                                class=bg-slate-950 border border-slate-800 text-xs text-slate-300 rounded-xl px-3 py-2 outline-none focusborder-indigo-500
+                                option value=ALLAll Coursesoption
+                                option value=APMA 2130APMA 2130option
+                                option value=MAE 2040MAE 2040option
+                                option value=ECE 2200ECE 2200option
+                                option value=STS 2600STS 2600option
+                                option value=MAE 2020MAE 2020option
+                                option value=StaticsStaticsoption
+                                option value=MARS RoverMARS Roveroption
+                                option value=GeneralGeneraloption
+                            select
+                            select id=filterTier onchange=renderActiveQuests()
+                                class=bg-slate-950 border border-slate-800 text-xs text-slate-300 rounded-xl px-3 py-2 outline-none focusborder-indigo-500
+                                option value=ALLAll Wheel Tiersoption
+                                option value=1Tier 1 (5-25 PTS)option
+                                option value=2Tier 2 (20-50 PTS)option
+                                option value=3Tier 3 (50-100 PTS)option
+                            select
+                        div
+                    div
+
+                    div id=activeQuestsList class=mt-4 space-y-3div
+                section
+
+                !-- Completed Spin Log --
+                section class=bg-slate-90090 backdrop-blur-md border border-slate-800 rounded-2xl p-5 shadow-xl
+                    div class=flex items-center justify-between pb-3 border-b border-slate-800
+                        div class=flex items-center gap-2.5
+                            span class=w-7 h-7 rounded-lg bg-emerald-50020 text-emerald-400 flex items-center justify-center text-xs
+                                i class=fa-solid fa-clock-rotate-lefti
+                            span
+                            h2 class=text-sm font-bold text-whiteRecent Wheel Spins & Card Pullsh2
+                        div
+                        button onclick=clearCompletedHistory() class=text-xs text-slate-500 hovertext-rose-400 transitionClear Logbutton
+                    div
+                    div id=completedHistoryList class=mt-3 space-y-2 max-h-64 overflow-y-auto pr-1div
+                section
+            div
+
+            !-- Right 5 Cols Interactive 3-Tier Roulette Wheel Stage --
+            div class=lgcol-span-5 lgsticky lgtop-36 space-y-6
+                section class=bg-slate-90095 backdrop-blur-md border border-slate-800 rounded-2xl p-5 shadow-2xl relative overflow-hidden
+                    !-- Decorative Top Glow --
+                    div class=absolute -top-24 left-12 -translate-x-12 w-72 h-40 bg-indigo-50015 rounded-full blur-3xl pointer-events-nonediv
+
+                    div class=flex items-center justify-between pb-3 border-b border-slate-800 relative z-10
+                        div
+                            h2 class=text-base font-extrabold text-white flex items-center gap-2
+                                i class=fa-solid fa-dharmachakra text-amber-400i
+                                spanPoint Roulette Wheelspan
+                            h2
+                            p id=wheelStatusSubtitle class=text-xs text-slate-400 mt-0.5Select an assignment to spin for points, or test-spin any tier!p
+                        div
+                    div
+
+                    !-- Wheel Tier Switcher Tabs --
+                    div class=grid grid-cols-3 gap-2 my-4 relative z-10
+                        button onclick=switchWheelPreviewTier(1) id=wheelTab-1
+                            class=py-2 px-2 rounded-xl text-xs font-bold border transition flex flex-col items-center bg-emerald-50020 border-emerald-500 text-emerald-300
+                            spanTier 1 Wheelspan
+                            span class=font-mono text-[11px] text-white5–25 PTSspan
+                        button
+                        button onclick=switchWheelPreviewTier(2) id=wheelTab-2
+                            class=py-2 px-2 rounded-xl text-xs font-bold border transition flex flex-col items-center bg-slate-950 border-slate-800 text-slate-400 hovertext-white
+                            spanTier 2 Wheelspan
+                            span class=font-mono text-[11px]20–50 PTSspan
+                        button
+                        button onclick=switchWheelPreviewTier(3) id=wheelTab-3
+                            class=py-2 px-2 rounded-xl text-xs font-bold border transition flex flex-col items-center bg-slate-950 border-slate-800 text-slate-400 hovertext-white
+                            spanTier 3 Wheelspan
+                            span class=font-mono text-[11px]50–100 PTSspan
+                        button
+                    div
+
+                    !-- Active Assignment Banner (When Queued for Official Spin) --
+                    div id=queuedQuestBanner class=hidden mb-4 p-3 rounded-xl bg-indigo-50015 border border-indigo-50040 flex items-center justify-between gap-2
+                        div class=min-w-0
+                            div class=text-[10px] font-mono uppercase tracking-wider text-indigo-300 font-boldOfficial Assignment Spin Readydiv
+                            div id=queuedQuestTitle class=text-xs smtext-sm font-bold text-white truncateAssignment Titlediv
+                        div
+                        button onclick=cancelQueuedSpin() class=text-xs text-slate-400 hovertext-white px-2 py-1 rounded-lg bg-slate-90080
+                            Cancel
+                        button
+                    div
+
+                    !-- Wheel Canvas Wrapper --
+                    div class=relative flex flex-col items-center justify-center my-2
+                        !-- Top Pointer Triangle --
+                        div class=z-20 -mb-3 filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]
+                            svg width=36 height=32 viewBox=0 0 36 32 fill=none
+                                path d=M18 32L3 4C1.5 1.5 3.3 0 6 0H30C32.7 0 34.5 1.5 33 4L18 32Z fill=#F59E0B stroke=#0F172A stroke-width=3
+                            svg
+                        div
+
+                        div class=relative w-72 h-72 smw-80 smh-80 flex items-center justify-center
+                            canvas id=rouletteCanvas width=340 height=340 class=w-full h-full rounded-full shadow-2xl border-4 border-slate-800 bg-slate-950canvas
+                            !-- Center Hub Cap --
+                            button id=centerSpinBtn onclick=triggerWheelSpin(event)
+                                class=absolute w-16 h-16 rounded-full bg-slate-900 border-4 border-amber-400 shadow-xl flex flex-col items-center justify-center text-white font-extrabold text-xs hoverscale-105 activescale-95 transition
+                                i class=fa-solid fa-play text-amber-400 text-xs mb-0.5i
+                                spanSPINspan
+                            button
+                        div
+                    div
+
+                    !-- Result Readout & Action Button --
+                    div id=wheelResultBanner class=mt-4 p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-center
+                        p id=wheelResultText class=text-xs smtext-sm text-slate-300 font-medium
+                            Click span class=text-emerald-400 font-semiboldComplete & Spinspan on any assignment on the left, or press span class=text-amber-400 font-semiboldSPINspan to test this wheel!
+                        p
+                    div
+
+                    div class=mt-3 flex gap-2
+                        button id=mainSpinActionBtn onclick=triggerWheelSpin(event)
+                            class=w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hoverfrom-amber-400 hoverto-orange-400 text-slate-950 font-extrabold text-sm shadow-lg shadow-amber-50020 activescale-[0.99] transition flex items-center justify-center gap-2
+                            i class=fa-solid fa-rotatei
+                            span id=mainSpinActionTextPractice Spin (Tier 1 5–25 PTS)span
+                        button
+                    div
+                section
+            div
+        div
+
+        !-- ========================================== --
+        !-- TAB 2 100-POINT CARD PACK SUMMON STAGE    --
+        !-- ========================================== --
+        div id=tabPanel-pack-opening class=hidden space-y-6
+            div class=grid grid-cols-1 lggrid-cols-12 gap-6 items-start
+                
+                !-- Left 5 Cols Deck Selector & Pack Purchase Controls --
+                div class=lgcol-span-5 space-y-5
+                    section class=bg-slate-90090 border border-slate-800 rounded-2xl p-5 shadow-xl
+                        div class=flex items-center justify-between pb-3 border-b border-slate-800
+                            div class=flex items-center gap-2.5
+                                span class=w-8 h-8 rounded-xl bg-amber-50020 text-amber-400 flex items-center justify-center
+                                    i class=fa-solid fa-box-openi
+                                span
+                                div
+                                    h2 class=text-base font-bold text-white1. Choose Your Card Deckh2
+                                    p class=text-xs text-slate-400Every 100 points lets you pull 1 random cardp
+                                div
+                            div
+                            span class=px-2.5 py-1 rounded-lg bg-amber-50015 border border-amber-50030 font-mono font-bold text-xs text-amber-300
+                                Cost 100 PTS
+                            span
+                        div
+
+                        !-- Deck Radio Cards --
+                        div id=packDeckSelectorList class=mt-4 space-y-2.5div
+
+                        !-- Rarity Drop Table Summary --
+                        div class=mt-5 p-3.5 rounded-xl bg-slate-950 border border-slate-800
+                            div class=flex items-center justify-between text-xs font-semibold text-slate-300 mb-2
+                                spanWeighted Rarity Drop Oddsspan
+                                button onclick=switchMainTab('deck-studio') class=text-indigo-400 hoverunderline text-[11px]Customize Odds →button
+                            div
+                            div id=packOddsSummaryRow class=grid grid-cols-5 gap-1.5 text-centerdiv
+                        div
+
+                        !-- Summon Button --
+                        button onclick=pullRandomCard(event) id=summonCardBtn
+                            class=mt-5 w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-amber-500 via-pink-500 to-indigo-600 hoverfrom-amber-400 hoverto-indigo-500 text-white font-extrabold text-sm shadow-xl shadow-pink-50020 activescale-95 transition flex items-center justify-center gap-2
+                            i class=fa-solid fa-wand-magic-sparklesi
+                            span id=summonCardBtnTextDraw Random Card (-100 PTS)span
+                        button
+                    section
+                div
+
+                !-- Right 7 Cols Interactive 3D Card Reveal Stage --
+                div class=lgcol-span-7
+                    section class=bg-slate-90090 border border-slate-800 rounded-2xl p-6 shadow-2xl min-h-[480px] flex flex-col items-center justify-center relative overflow-hidden
+                        div class=absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.12),transparent_70%)] pointer-events-nonediv
+
+                        div id=gachaStageContainer class=relative z-10 w-full flex flex-col items-center justify-center text-center
+                            !-- Default Idle State or Drawn Card Stage --
+                            div class=w-64 smw-72 h-96 perspective-1000 mx-auto id=gachaCardWrapper
+                                div id=gachaCardInner class=w-full h-full relative card-inner cursor-pointer onclick=flipRevealedCard()
+                                    
+                                    !-- Card Back (Pack Cover) --
+                                    div class=w-full h-full rounded-2xl bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 border-2 border-indigo-50050 shadow-2xl flex flex-col items-center justify-center p-6 backface-hidden
+                                        div class=w-20 h-20 rounded-full bg-indigo-50020 border border-indigo-40040 flex items-center justify-center mb-4 animate-pulse
+                                            i class=fa-solid fa-dice-d20 text-4xl text-amber-400i
+                                        div
+                                        h3 class=text-base font-extrabold text-white tracking-wider uppercaseEngiQuesth3
+                                        p id=packCoverDeckName class=text-xs font-mono text-indigo-300 mt-1All-Access Master Deckp
+                                        div class=mt-8 px-3 py-1 rounded-full bg-slate-95090 border border-slate-700 text-[11px] text-slate-300
+                                            Ready to Summon
+                                        div
+                                    div
+
+                                    !-- Card Front (Revealed Collectible Card) --
+                                    div id=gachaCardFront class=w-full h-full rounded-2xl p-1 shadow-2xl absolute inset-0 backface-hidden rotate-y-180 bg-slate-800
+                                        !-- Dynamically filled when card is pulled --
+                                    div
+
+                                div
+                            div
+
+                            p id=gachaStageStatus class=text-xs smtext-sm text-slate-400 mt-5 max-w-md
+                                Earn 100 points from your assignment wheel spins, select a deck on the left, and pull a random trading card!
+                            p
+                        div
+                    section
+                div
+
+            div
+        div
+
+        !-- ========================================== --
+        !-- TAB 3 TRADING CARD COLLECTION BINDER      --
+        !-- ========================================== --
+        div id=tabPanel-binder class=hidden space-y-6
+            
+            !-- Binder Overview & Filters --
+            section class=bg-slate-90090 border border-slate-800 rounded-2xl p-5 shadow-xl
+                div class=flex flex-col mdflex-row mditems-center justify-between gap-4 pb-4 border-b border-slate-800
+                    div
+                        h2 class=text-lg font-extrabold text-white flex items-center gap-2
+                            i class=fa-solid fa-book-open text-cyan-400i
+                            spanPersonal Trading Card Binderspan
+                        h2
+                        p class=text-xs text-slate-400 mt-0.5Collect every card across all rarity tiers. Uncollected cards appear as locked silhouettes.p
+                    div
+
+                    div class=flex flex-wrap items-center gap-2.5
+                        select id=binderFilterDeck onchange=renderCardBinder()
+                            class=bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-xl px-3.5 py-2 outline-none focusborder-indigo-500
+                            option value=ALLAll Decksoption
+                        select
+
+                        select id=binderFilterRarity onchange=renderCardBinder()
+                            class=bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-xl px-3.5 py-2 outline-none focusborder-indigo-500
+                            option value=ALLAll Raritiesoption
+                            option value=CommonCommonoption
+                            option value=UncommonUncommonoption
+                            option value=RareRareoption
+                            option value=EpicEpicoption
+                            option value=LegendaryLegendaryoption
+                        select
+                    div
+                div
+
+                !-- Deck Completion Progress Bars --
+                div id=deckCompletionBars class=grid grid-cols-1 smgrid-cols-2 lggrid-cols-4 gap-3 mt-4div
+            section
+
+            !-- Cards Grid --
+            div id=binderCardsGrid class=grid grid-cols-1 smgrid-cols-2 mdgrid-cols-3 lggrid-cols-4 gap-4div
+        div
+
+        !-- ========================================== --
+        !-- TAB 4 DECK & RARITY ODDS STUDIO           --
+        !-- ========================================== --
+        div id=tabPanel-deck-studio class=hidden space-y-6
+            div class=grid grid-cols-1 lggrid-cols-12 gap-6 items-start
+                
+                !-- Left 5 Cols Weighted Rarity Odds Configurator --
+                div class=lgcol-span-5 space-y-6
+                    section class=bg-slate-90090 border border-slate-800 rounded-2xl p-5 shadow-xl
+                        div class=flex items-center justify-between pb-3 border-b border-slate-800
+                            div
+                                h2 class=text-base font-bold text-whiteWeighted Rarity Oddsh2
+                                p class=text-xs text-slate-400Adjust relative weights for the random card rollerp
+                            div
+                            button onclick=resetDefaultWeights() class=text-xs text-indigo-400 hoverunderlineReset Defaultsbutton
+                        div
+
+                        div id=rarityWeightsForm class=mt-4 space-y-3div
+                    section
+                div
+
+                !-- Right 7 Cols Add Custom Card to Any Deck --
+                div class=lgcol-span-7 space-y-6
+                    section class=bg-slate-90090 border border-slate-800 rounded-2xl p-5 shadow-xl
+                        div class=pb-3 border-b border-slate-800
+                            h2 class=text-base font-bold text-whiteCreate Custom Collectible Cardh2
+                            p class=text-xs text-slate-400Add new cards to your personal decks anytimep
+                        div
+
+                        form onsubmit=handleAddCustomCard(event) class=mt-4 space-y-4
+                            div class=grid grid-cols-1 smgrid-cols-2 gap-3.5
+                                div
+                                    label class=block text-xs font-medium text-slate-400 mb-1Card Titlelabel
+                                    input type=text id=customCardTitle required placeholder=e.g., Harmonic Drive Actuator
+                                        class=w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focusborder-indigo-500
+                                div
+                                div
+                                    label class=block text-xs font-medium text-slate-400 mb-1Deck Categorylabel
+                                    input type=text id=customCardDeck required list=existingDecksDatalist placeholder=e.g., Robotics & Mechatronics
+                                        class=w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focusborder-indigo-500
+                                    datalist id=existingDecksDatalistdatalist
+                                div
+                            div
+
+                            div class=grid grid-cols-1 smgrid-cols-2 gap-3.5
+                                div
+                                    label class=block text-xs font-medium text-slate-400 mb-1Rarity Tierlabel
+                                    select id=customCardRarity
+                                        class=w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focusborder-indigo-500
+                                        option value=CommonCommonoption
+                                        option value=UncommonUncommonoption
+                                        option value=RareRareoption
+                                        option value=EpicEpicoption
+                                        option value=LegendaryLegendaryoption
+                                    select
+                                div
+                                div
+                                    label class=block text-xs font-medium text-slate-400 mb-1Card Artwork Iconlabel
+                                    select id=customCardIcon
+                                        class=w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focusborder-indigo-500
+                                        option value=fa-robot🤖 Robot  Mechatronicsoption
+                                        option value=fa-gears⚙️ Gears  Transmissionoption
+                                        option value=fa-microchip💻 Microchip  PCBoption
+                                        option value=fa-cube🧊 3D CAD  SolidWorksoption
+                                        option value=fa-music🎵 Dance  Choreographyoption
+                                        option value=fa-person-skating🛹 Longboard  Groundsoption
+                                        option value=fa-brain🧠 Brain Tickler  Mathoption
+                                        option value=fa-trophy🏆 Trophy  Milestoneoption
+                                        option value=fa-bolt⚡ High Voltage  Energyoption
+                                        option value=fa-rocket🚀 Aerospace  Roveroption
+                                    select
+                                div
+                            div
+
+                            div
+                                label class=block text-xs font-medium text-slate-400 mb-1Flavor Text  Descriptionlabel
+                                input type=text id=customCardFlavor required placeholder=e.g., Zero backlash precision for heavy robotic manipulators.
+                                    class=w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focusborder-indigo-500
+                            div
+
+                            button type=submit
+                                class=w-full py-2.5 px-4 rounded-xl bg-indigo-600 hoverbg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-60025 transition
+                                i class=fa-solid fa-plus mr-1.5i Add Card to Deck Pool
+                            button
+                        form
+                    section
+                div
+
+            div
+        div
+
+    main
+
+    !-- Toast Notification Container --
+    div id=toastContainer class=fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 smpx-0div
+
+    !-- Standalone Operation & Backup Modal --
+    div id=backupModal class=fixed inset-0 z-50 hidden items-center justify-center bg-slate-95080 backdrop-blur-sm p-4
+        div class=bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4
+            div class=flex items-center justify-between
+                div class=flex items-center gap-3
+                    div class=w-10 h-10 rounded-xl bg-cyan-50015 text-cyan-400 flex items-center justify-center text-lg
+                        i class=fa-solid fa-cloud-arrow-downi
+                    div
+                    div
+                        h3 class=text-base font-bold text-whiteStandalone Save & Data Backuph3
+                        p class=text-xs text-slate-400Cloud Sync + Portable JSON Save Filep
+                    div
+                div
+                button onclick=closeBackupModal() class=text-slate-400 hovertext-white
+                    i class=fa-solid fa-xmarki
+                button
+            div
+
+            div class=p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 space-y-2 leading-relaxed
+                pstrong class=text-emerald-4001. Automatic Cloud Savestrong Your points, wheel spins, and collected trading cards automatically sync to your cloud profile while using this app.p
+                pstrong class=text-cyan-4002. Portable Save Filestrong Download a `.json` backup file anytime or import it on another computer so you never lose your collection.p
+            div
+
+            div class=grid grid-cols-1 smgrid-cols-2 gap-3 pt-1
+                button onclick=exportSaveJson()
+                    class=py-2.5 px-4 rounded-xl bg-indigo-600 hoverbg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition
+                    i class=fa-solid fa-downloadi
+                    spanDownload Backup (.json)span
+                button
+                label class=cursor-pointer py-2.5 px-4 rounded-xl bg-slate-800 hoverbg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-2 transition
+                    i class=fa-solid fa-uploadi
+                    spanImport Backup (.json)span
+                    input type=file accept=.json onchange=importSaveJson(event) class=hidden
+                label
+            div
+        div
+    div
+
+    !-- Reset Confirmation Modal --
+    div id=resetModal class=fixed inset-0 z-50 hidden items-center justify-center bg-slate-95080 backdrop-blur-sm p-4
+        div class=bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl
+            div class=flex items-center gap-3 text-rose-400 mb-3
+                div class=w-10 h-10 rounded-xl bg-rose-50015 flex items-center justify-center text-lg
+                    i class=fa-solid fa-triangle-exclamationi
+                div
+                h3 class=text-lg font-bold text-whiteReset Tracker & Binderh3
+            div
+            p class=text-sm text-slate-300 leading-relaxed mb-6
+                This will restore the default engineering assignments, starter point balance, and reset your collected cards.
+            p
+            div class=flex items-center justify-end gap-3
+                button onclick=closeResetModal() class=px-4 py-2 rounded-xl bg-slate-800 hoverbg-slate-700 text-slate-300 text-sm font-medium transition
+                    Cancel
+                button
+                button onclick=confirmResetData() class=px-4 py-2 rounded-xl bg-rose-600 hoverbg-rose-500 text-white text-sm font-semibold shadow-lg shadow-rose-60025 transition
+                    Reset Demo Data
+                button
+            div
+        div
+    div
+
+    !-- ========================================== --
+    !-- APPLICATION LOGIC & CLOUD PERSISTENCE      --
+    !-- ========================================== --
+    script type=module
+        import { initializeApp } from httpswww.gstatic.comfirebasejs11.6.1firebase-app.js;
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from httpswww.gstatic.comfirebasejs11.6.1firebase-auth.js;
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from httpswww.gstatic.comfirebasejs11.6.1firebase-firestore.js;
+
+         ==========================================
+         1. THREE-TIER WHEEL DEFINITIONS
+         ==========================================
+        const WHEEL_TIERS = {
+            1 {
+                name Tier 1 • Low-Point Assignment,
+                shortName Tier 1 (5–25 PTS),
+                min 5,
+                max 25,
+                slices [5, 8, 10, 12, 15, 18, 20, 25],
+                colors ['#065f46', '#047857', '#059669', '#10b981', '#0d9488', '#0f766e', '#047857', '#f59e0b'],
+                badgeClass bg-emerald-50015 text-emerald-300 border-emerald-50030
+            },
+            2 {
+                name Tier 2 • Medium-Point Assignment,
+                shortName Tier 2 (20–50 PTS),
+                min 20,
+                max 50,
+                slices [20, 25, 30, 35, 40, 45, 30, 50],
+                colors ['#1e3a8a', '#1d4ed8', '#0284c7', '#0ea5e9', '#4f46e5', '#6366f1', '#0369a1', '#f59e0b'],
+                badgeClass bg-cyan-50015 text-cyan-300 border-cyan-50030
+            },
+            3 {
+                name Tier 3 • High-Point Assignment,
+                shortName Tier 3 (50–100 PTS),
+                min 50,
+                max 100,
+                slices [50, 60, 65, 70, 75, 80, 90, 100],
+                colors ['#7c2d12', '#9a3412', '#b45309', '#d97706', '#9333ea', '#7e22ce', '#be123c', '#f59e0b'],
+                badgeClass bg-amber-50015 text-amber-300 border-amber-50030
+            }
+        };
+
+         ==========================================
+         2. RARITY TIERS & STARTER CARD POOL
+         ==========================================
+        const RARITY_META = {
+            Common {
+                color text-slate-300,
+                border border-slate-600,
+                bg bg-slate-80090,
+                badge bg-slate-700 text-slate-200,
+                glow 
+            },
+            Uncommon {
+                color text-emerald-300,
+                border border-emerald-50070,
+                bg bg-gradient-to-b from-emerald-95090 to-slate-900,
+                badge bg-emerald-50020 text-emerald-300 border border-emerald-50040,
+                glow shadow-lg shadow-emerald-50010
+            },
+            Rare {
+                color text-cyan-300,
+                border border-cyan-400,
+                bg bg-gradient-to-b from-cyan-95090 via-slate-900 to-slate-950,
+                badge bg-cyan-50020 text-cyan-300 border border-cyan-40040,
+                glow shadow-lg shadow-cyan-50020
+            },
+            Epic {
+                color text-purple-300,
+                border border-purple-400,
+                bg bg-gradient-to-b from-purple-95090 via-indigo-95080 to-slate-950,
+                badge bg-purple-50025 text-purple-200 border border-purple-40050,
+                glow shadow-xl shadow-purple-50025
+            },
+            Legendary {
+                color text-amber-300,
+                border border-amber-300,
+                bg bg-gradient-to-b from-amber-95090 via-rose-95070 to-slate-950,
+                badge bg-amber-400 text-slate-950 font-black,
+                glow shadow-2xl shadow-amber-50030
+            }
+        };
+
+        const DEFAULT_CARDS = [
+             Deck 1 Robotics & Mechatronics
+            { id 'c-rob-1', title 'NEMA 17 Stepper Motor', deck 'Robotics & Mechatronics', rarity 'Common', icon 'fa-gears', flavor 'Reliable open-loop workhorse for every prototype.' },
+            { id 'c-rob-2', title '501 Planetary Gearbox', deck 'Robotics & Mechatronics', rarity 'Uncommon', icon 'fa-gear', flavor 'High-torque reduction ready for heavy arm joints.' },
+            { id 'c-rob-3', title 'Kraken X60 Brushless', deck 'Robotics & Mechatronics', rarity 'Rare', icon 'fa-bolt', flavor 'Compact Neo-class power density for competition drivetrains.' },
+            { id 'c-rob-4', title '6-DOF Inverse Kinematics', deck 'Robotics & Mechatronics', rarity 'Epic', icon 'fa-robot', flavor 'Smooth Jacobian wrist trajectories without singularities.' },
+            { id 'c-rob-5', title 'MARS Rover Articulated Arm', deck 'Robotics & Mechatronics', rarity 'Legendary', icon 'fa-rocket', flavor 'Full-scale desert-ready robotic manipulator assembly.' },
+
+             Deck 2 CAD & Manufacturing
+            { id 'c-cad-1', title 'Fully Defined Black Sketch', deck 'CAD & Manufacturing', rarity 'Common', icon 'fa-pen-ruler', flavor 'Zero blue lines remaining. Pure parametric peace of mind.' },
+            { id 'c-cad-2', title '3D Printed PETG Jig', deck 'CAD & Manufacturing', rarity 'Uncommon', icon 'fa-layer-group', flavor 'Fresh off the build plate with zero warping.' },
+            { id 'c-cad-3', title 'McMaster-Carr STEP Vault', deck 'CAD & Manufacturing', rarity 'Rare', icon 'fa-screwdriver-wrench', flavor 'Every fastener and bearing imported in 3 seconds flat.' },
+            { id 'c-cad-4', title 'FEA Von Mises Convergence', deck 'CAD & Manufacturing', rarity 'Epic', icon 'fa-chart-area', flavor 'Factor of safety 2.5 with weight shaved by 40%.' },
+            { id 'c-cad-5', title 'Certified SolidWorks Master', deck 'CAD & Manufacturing', rarity 'Legendary', icon 'fa-cube', flavor 'Flawless multi-body surfacing and zero rebuild errors.' },
+
+             Deck 3 Dance & Movement
+            { id 'c-dnc-1', title 'Eight-Count Warmup Groove', deck 'Dance & Movement', rarity 'Common', icon 'fa-music', flavor 'Locking into the pocket right as the bass drops.' },
+            { id 'c-dnc-2', title 'Crisp Chest Isolation', deck 'Dance & Movement', rarity 'Uncommon', icon 'fa-wave-square', flavor 'Sharp musicality hitting every snare accent.' },
+            { id 'c-dnc-3', title 'Late-Night Studio Blocking', deck 'Dance & Movement', rarity 'Rare', icon 'fa-users-viewfinder', flavor 'Seamless formation transitions across the entire team.' },
+            { id 'c-dnc-4', title 'Choreography Brainstorm Flow', deck 'Dance & Movement', rarity 'Epic', icon 'fa-wand-magic-sparkles', flavor 'When the phrasing and movement click on the first take.' },
+            { id 'c-dnc-5', title 'Showstopper Center Stage', deck 'Dance & Movement', rarity 'Legendary', icon 'fa-star', flavor 'Full-house applause under the stage lights.' },
+
+             Deck 4 Grounds & Brain Ticklers
+            { id 'c-uva-1', title 'Longboard Cruise on Grounds', deck 'Grounds & Brain Ticklers', rarity 'Common', icon 'fa-person-skating', flavor 'Carving smooth pavement between Thornton and Rice Hall.' },
+            { id 'c-uva-2', title 'Laplace Domain Shortcut', deck 'Grounds & Brain Ticklers', rarity 'Uncommon', icon 'fa-square-root-variable', flavor 'Turning ugly differential equations into clean algebra.' },
+            { id 'c-uva-3', title 'Rotunda Golden Hour', deck 'Grounds & Brain Ticklers', rarity 'Rare', icon 'fa-sun', flavor 'A well-earned sunset break after a brutal lab block.' },
+            { id 'c-uva-4', title 'First-Principles Intuition', deck 'Grounds & Brain Ticklers', rarity 'Epic', icon 'fa-lightbulb', flavor 'Deriving the solution without needing the formula sheet.' },
+            { id 'c-uva-5', title 'Tau Beta Pi Brain Tickler Crown', deck 'Grounds & Brain Ticklers', rarity 'Legendary', icon 'fa-brain', flavor 'Cracking the toughest combinatorial puzzle of the semester.' }
+        ];
+
+        const COURSE_STYLES = {
+            APMA 2130 bg-purple-50015 text-purple-300 border-purple-50030,
+            MAE 2040 bg-cyan-50015 text-cyan-300 border-cyan-50030,
+            ECE 2200 bg-amber-50015 text-amber-300 border-amber-50030,
+            STS 2600 bg-emerald-50015 text-emerald-300 border-emerald-50030,
+            MAE 2020 bg-rose-50015 text-rose-300 border-rose-50030,
+            Statics bg-blue-50015 text-blue-300 border-blue-50030,
+            MARS Rover bg-orange-50015 text-orange-300 border-orange-50030,
+            General bg-slate-50015 text-slate-300 border-slate-50030
+        };
+
+        function getRelativeDate(daysOffset) {
+            const d = new Date();
+            d.setDate(d.getDate() + daysOffset);
+            return d.toISOString().split('T')[0];
+        }
+
+        function getDefaultState() {
+            return {
+                availablePoints 145,  Starts with enough points for 1 immediate card pull!
+                lifetimePoints 245,
+                soundEnabled true,
+                selectedPackDeck 'ALL',
+                rarityWeights {
+                    Common 50,
+                    Uncommon 28,
+                    Rare 14,
+                    Epic 6,
+                    Legendary 2
+                },
+                quests [
+                    {
+                        id 'q-101',
+                        title 'Reflection 4 Engineering Ethics Case Study',
+                        course 'STS 2600',
+                        tier 1,
+                        dueDate getRelativeDate(1)
+                    },
+                    {
+                        id 'q-102',
+                        title 'Shear & Bending Moment Diagrams Homework',
+                        course 'Statics',
+                        tier 2,
+                        dueDate getRelativeDate(2)
+                    },
+                    {
+                        id 'q-103',
+                        title 'Wrist Differential Gearbox CAD Assembly',
+                        course 'MARS Rover',
+                        tier 2,
+                        dueDate getRelativeDate(3)
+                    },
+                    {
+                        id 'q-104',
+                        title 'RC & RLC Transient Circuit Lab Report',
+                        course 'ECE 2200',
+                        tier 2,
+                        dueDate getRelativeDate(4)
+                    },
+                    {
+                        id 'q-105',
+                        title 'APMA 2130 Cumulative Practice Exam',
+                        course 'APMA 2130',
+                        tier 3,
+                        dueDate getRelativeDate(5)
+                    }
+                ],
+                completedHistory [
+                    {
+                        id 'h-1',
+                        kind 'SPIN',
+                        title '3D Printed Bracket Tolerance Check',
+                        course 'MAE 2040',
+                        tier 1,
+                        points 20,
+                        timestamp 'Yesterday'
+                    },
+                    {
+                        id 'h-2',
+                        kind 'CARD',
+                        title 'Pulled Fully Defined Black Sketch (Common)',
+                        points 100,
+                        timestamp 'Yesterday'
+                    }
+                ],
+                cards DEFAULT_CARDS,
+                collectedCards {
+                    'c-cad-1' 1,
+                    'c-rob-1' 1
+                }
+            };
+        }
+
+        let appState = getDefaultState();
+        let activeTab = 'quests';
+        let currentWheelTier = 1;
+        let queuedQuestForSpin = null;  Holds quest object when user clicks Complete & Spin
+        let isWheelSpinning = false;
+        let wheelAngle = 0;
+
+         ==========================================
+         3. CLOUD SYNC (FIRESTORE) INITIALIZATION
+         ==========================================
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        const appId = typeof __app_id !== 'undefined'  __app_id  'engiquest-default-app';
+
+        async function initCloudPersistence() {
+            try {
+                if (typeof __firebase_config === 'undefined'  !__firebase_config) {
+                    setSyncBadge('Ready (Local Session)', 'emerald');
+                    return;
+                }
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                currentUser = auth.currentUser;
+                if (!currentUser) return;
+
+                const stateDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'trackerState', 'mainDoc');
+                const snap = await getDoc(stateDocRef);
+
+                if (snap.exists()) {
+                    const cloudData = snap.data();
+                    if (cloudData && cloudData.payload) {
+                        const parsed = JSON.parse(cloudData.payload);
+                        appState = { ...getDefaultState(), ...parsed };
+                        renderAll();
+                    }
+                } else {
+                    await saveStateToCloud();
+                }
+
+                setSyncBadge('Cloud Synced', 'emerald');
+            } catch (err) {
+                console.warn('Cloud persistence fallback', err);
+                setSyncBadge('Session Active', 'cyan');
+            }
+        }
+
+        async function saveStateToCloud() {
+            if (!currentUser  !db) return;
+            try {
+                setSyncBadge('Saving...', 'amber');
+                const stateDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'trackerState', 'mainDoc');
+                await setDoc(stateDocRef, {
+                    payload JSON.stringify(appState),
+                    updatedAt Date.now()
+                });
+                setSyncBadge('Cloud Synced', 'emerald');
+            } catch (err) {
+                console.error('Error saving to cloud', err);
+            }
+        }
+
+        function setSyncBadge(text, color = 'emerald') {
+            const badge = document.getElementById('syncStatusBadge');
+            if (!badge) return;
+            badge.innerHTML = `
+                span class=w-1.5 h-1.5 rounded-full bg-${color}-400span
+                span${text}span
+            `;
+        }
+
+        function saveState() {
+            saveStateToCloud();
+        }
+
+         ==========================================
+         4. WEB AUDIO SYNTHESIZER (TICKS, FANFARE, GACHA)
+         ==========================================
+        let audioCtx = null;
+
+        function ensureAudio() {
+            if (!appState.soundEnabled) return null;
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext  window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playSound(type) {
+            const ctx = ensureAudio();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+
+            try {
+                if (type === 'tick') {
+                     Crisp wooden peg click on wheel slice boundary
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(750, now);
+                    osc.frequency.exponentialRampToValueAtTime(220, now + 0.03);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.035);
+                } else if (type === 'win') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) = {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx  0.075);
+                        gain.gain.setValueAtTime(0.16, now + idx  0.075);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx  0.075 + 0.38);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(now + idx  0.075);
+                        osc.stop(now + idx  0.075 + 0.38);
+                    });
+                } else if (type === 'gacha-epic') {
+                    const notes = [440, 554.37, 659.25, 880, 1108.73];
+                    notes.forEach((freq, idx) = {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx  0.09);
+                        gain.gain.setValueAtTime(0.2, now + idx  0.09);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx  0.09 + 0.5);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(now + idx  0.09);
+                        osc.stop(now + idx  0.09 + 0.5);
+                    });
+                }
+            } catch (e) {}
+        }
+
+         ==========================================
+         5. HTML5 CANVAS ROULETTE WHEEL ENGINE
+         ==========================================
+        function drawRouletteWheel() {
+            const canvas = document.getElementById('rouletteCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const tierConfig = WHEEL_TIERS[currentWheelTier];
+            const slices = tierConfig.slices;
+            const numSlices = slices.length;
+            const arc = (2  Math.PI)  numSlices;
+            const centerX = canvas.width  2;
+            const centerY = canvas.height  2;
+            const radius = centerX - 10;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i  numSlices; i++) {
+                const startAngle = wheelAngle + i  arc;
+                const endAngle = startAngle + arc;
+
+                 Slice Wedge
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = tierConfig.colors[i % tierConfig.colors.length];
+                ctx.fill();
+
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#0f172a';
+                ctx.stroke();
+
+                 Slice Point Label
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + arc  2);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '800 16px JetBrains Mono, monospace';
+                ctx.fillText(`${slices[i]} PTS`, radius - 22, 6);
+                ctx.restore();
+
+                 Outer Peg Stud
+                const pegX = centerX + Math.cos(startAngle)  (radius - 4);
+                const pegY = centerY + Math.sin(startAngle)  (radius - 4);
+                ctx.beginPath();
+                ctx.arc(pegX, pegY, 3.5, 0, 2  Math.PI);
+                ctx.fillStyle = '#f8fafc';
+                ctx.fill();
+            }
+        }
+
+        window.switchWheelPreviewTier = function(tierNum) {
+            if (isWheelSpinning) return;
+            currentWheelTier = Number(tierNum);
+
+             If user manually switches wheel tier while no quest is locked, update tabs
+            [1, 2, 3].forEach(t = {
+                const tab = document.getElementById(`wheelTab-${t}`);
+                if (!tab) return;
+                if (t === currentWheelTier) {
+                    tab.className = py-2 px-2 rounded-xl text-xs font-bold border transition flex flex-col items-center bg-indigo-50020 border-indigo-400 text-white shadow;
+                } else {
+                    tab.className = py-2 px-2 rounded-xl text-xs font-bold border transition flex flex-col items-center bg-slate-950 border-slate-800 text-slate-400 hovertext-white;
+                }
+            });
+
+            updateSpinActionLabels();
+            drawRouletteWheel();
+        };
+
+        function updateSpinActionLabels() {
+            const tierInfo = WHEEL_TIERS[currentWheelTier];
+            const banner = document.getElementById('queuedQuestBanner');
+            const mainBtnText = document.getElementById('mainSpinActionText');
+
+            if (queuedQuestForSpin) {
+                banner.classList.remove('hidden');
+                document.getElementById('queuedQuestTitle').textContent = `${queuedQuestForSpin.title} (${tierInfo.shortName})`;
+                mainBtnText.textContent = `SPIN FOR OFFICIAL POINTS (${tierInfo.min}–${tierInfo.max} PTS)`;
+            } else {
+                banner.classList.add('hidden');
+                mainBtnText.textContent = `Practice Spin (${tierInfo.shortName})`;
+            }
+        }
+
+        window.queueQuestSpin = function(questId) {
+            if (isWheelSpinning) return;
+            const quest = appState.quests.find(q = q.id === questId);
+            if (!quest) return;
+
+            queuedQuestForSpin = quest;
+            currentWheelTier = Number(quest.tier)  1;
+            switchWheelPreviewTier(currentWheelTier);
+
+            document.getElementById('wheelResultText').innerHTML = `
+                Ready to complete strong class=text-white${escapeHtml(quest.title)}strong! Click strong class=text-amber-400SPINstrong to roll your ${WHEEL_TIERS[currentWheelTier].min}–${WHEEL_TIERS[currentWheelTier].max} point payout!
+            `;
+
+             Smooth scroll wheel into view on mobile
+            document.getElementById('rouletteCanvas').scrollIntoView({ behavior 'smooth', block 'center' });
+        };
+
+        window.cancelQueuedSpin = function() {
+            if (isWheelSpinning) return;
+            queuedQuestForSpin = null;
+            updateSpinActionLabels();
+            document.getElementById('wheelResultText').textContent = 'Official spin canceled. Select an assignment or do a practice spin!';
+        };
+
+        window.triggerWheelSpin = function(event) {
+            if (isWheelSpinning) return;
+            isWheelSpinning = true;
+
+            const tierInfo = WHEEL_TIERS[currentWheelTier];
+            const slices = tierInfo.slices;
+            const numSlices = slices.length;
+            const arc = (2  Math.PI)  numSlices;
+
+             Total spin duration & random target angle (at least 6 full rotations)
+            const extraSpins = (6 + Math.random()  4)  2  Math.PI;
+            const startAngle = wheelAngle;
+            const targetAngle = startAngle + extraSpins;
+            const duration = 3400;
+            const startTime = performance.now();
+            let lastTickSlice = -1;
+
+            function animateWheel(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(1, elapsed  duration);
+                 Cubic ease-out deceleration
+                const eased = 1 - Math.pow(1 - progress, 3.5);
+                wheelAngle = startAngle + extraSpins  eased;
+
+                 Determine current slice passing top pointer (-PI  2)
+                const pointerAngle = (1.5  Math.PI - (wheelAngle % (2  Math.PI)) + 2  Math.PI) % (2  Math.PI);
+                const currentSliceIndex = Math.floor(pointerAngle  arc) % numSlices;
+
+                if (currentSliceIndex !== lastTickSlice) {
+                    lastTickSlice = currentSliceIndex;
+                    playSound('tick');
+                }
+
+                drawRouletteWheel();
+
+                if (progress  1) {
+                    requestAnimationFrame(animateWheel);
+                } else {
+                    isWheelSpinning = false;
+                    const wonPoints = slices[currentSliceIndex];
+                    finalizeSpinOutcome(wonPoints, event);
+                }
+            }
+
+            requestAnimationFrame(animateWheel);
+        };
+
+        function finalizeSpinOutcome(wonPoints, event) {
+            playSound('win');
+
+            if (queuedQuestForSpin) {
+                const completedQuest = queuedQuestForSpin;
+                appState.availablePoints += wonPoints;
+                appState.lifetimePoints += wonPoints;
+
+                 Remove from active quests & add to history
+                appState.quests = appState.quests.filter(q = q.id !== completedQuest.id);
+                appState.completedHistory.unshift({
+                    id 'h-' + Date.now(),
+                    kind 'SPIN',
+                    title completedQuest.title,
+                    course completedQuest.course,
+                    tier completedQuest.tier,
+                    points wonPoints,
+                    timestamp 'Just now'
+                });
+
+                queuedQuestForSpin = null;
+                saveState();
+                renderAll();
+
+                spawnFloatingText(event, `+${wonPoints} PTS!`, 'text-amber-400');
+                document.getElementById('wheelResultText').innerHTML = `
+                    span class=text-emerald-400 font-extrabold text-baseJACKPOT! +${wonPoints} PTS EARNED!spanbr
+                    span class=text-xs text-slate-400Completed ${escapeHtml(completedQuest.title)}span
+                `;
+                showToast(`Wheel landed on +${wonPoints} PTS for ${completedQuest.title}!`, 'fa-dharmachakra', 'text-amber-400');
+            } else {
+                 Practice Spin Outcome
+                document.getElementById('wheelResultText').innerHTML = `
+                    span class=text-cyan-400 font-boldPractice Spin Result ${wonPoints} PTS!spanbr
+                    span class=text-xs text-slate-400Click Complete & Spin on an active assignment on the left to bank real points!span
+                `;
+                showToast(`Practice Spin landed on ${wonPoints} PTS!`, 'fa-dice', 'text-cyan-400');
+            }
+        }
+
+         ==========================================
+         6. 100-POINT TRADING CARD GACHA SYSTEM
+         ==========================================
+        function getAllDeckNames() {
+            const set = new Set(appState.cards.map(c = c.deck));
+            return Array.from(set);
+        }
+
+        function rollWeightedRarity() {
+            const weights = appState.rarityWeights;
+            const entries = Object.entries(weights);
+            const totalWeight = entries.reduce((acc, [, w]) = acc + Math.max(0, Number(w)  0), 0);
+            if (totalWeight = 0) return 'Common';
+
+            let randomRoll = Math.random()  totalWeight;
+            for (const [rarity, weight] of entries) {
+                const w = Math.max(0, Number(weight)  0);
+                if (randomRoll  w) {
+                    return rarity;
+                }
+                randomRoll -= w;
+            }
+            return 'Common';
+        }
+
+        window.pullRandomCard = function(event) {
+            if (appState.availablePoints  100) {
+                showToast('You need 100 Points to pull a card! Complete assignments to spin the wheel.', 'fa-lock', 'text-rose-400');
+                return;
+            }
+
+            const targetDeck = appState.selectedPackDeck  'ALL';
+            const deckPool = targetDeck === 'ALL'
+                 appState.cards
+                 appState.cards.filter(c = c.deck === targetDeck);
+
+            if (deckPool.length === 0) {
+                showToast('No cards found in this deck!', 'fa-circle-exclamation', 'text-rose-400');
+                return;
+            }
+
+             Deduct 100 points
+            appState.availablePoints -= 100;
+
+             Roll weighted rarity first, then pick a random card matching that rarity in the chosen deck (or fallback to any in deck)
+            const rolledRarity = rollWeightedRarity();
+            let rarityPool = deckPool.filter(c = c.rarity === rolledRarity);
+            if (rarityPool.length === 0) {
+                rarityPool = deckPool;
+            }
+
+            const chosenCard = rarityPool[Math.floor(Math.random()  rarityPool.length)];
+            const prevCount = appState.collectedCards[chosenCard.id]  0;
+            const isNewDiscovery = prevCount === 0;
+            appState.collectedCards[chosenCard.id] = prevCount + 1;
+
+            appState.completedHistory.unshift({
+                id 'h-' + Date.now(),
+                kind 'CARD',
+                title `Pulled ${chosenCard.title} (${chosenCard.rarity})`,
+                points 100,
+                timestamp 'Just now'
+            });
+
+            saveState();
+            renderAll();
+
+             Render & Flip the 3D Card on Stage
+            revealCardOnStage(chosenCard, isNewDiscovery, appState.collectedCards[chosenCard.id]);
+            spawnFloatingText(event, `-100 PTS`, 'text-pink-400');
+        };
+
+        function revealCardOnStage(card, isNewDiscovery, totalOwned) {
+            const inner = document.getElementById('gachaCardInner');
+            const front = document.getElementById('gachaCardFront');
+            const status = document.getElementById('gachaStageStatus');
+            const rMeta = RARITY_META[card.rarity]  RARITY_META.Common;
+
+             Reset flip first
+            inner.classList.remove('card-flipped');
+
+            const isLegendary = card.rarity === 'Legendary';
+            const outerBg = isLegendary  'rarity-legendary-card p-1'  `${rMeta.bg} border-2 ${rMeta.border} p-4`;
+
+            front.className = `w-full h-full rounded-2xl shadow-2xl absolute inset-0 backface-hidden rotate-y-180 ${outerBg} ${rMeta.glow}`;
+            front.innerHTML = `
+                div class=${isLegendary  'w-full h-full bg-slate-95095 rounded-xl p-4 flex flex-col justify-between'  'w-full h-full flex flex-col justify-between'}
+                    div class=flex items-center justify-between gap-1
+                        span class=text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded ${rMeta.badge}
+                            ${escapeHtml(card.rarity)}
+                        span
+                        span class=text-[10px] font-mono font-bold px-2 py-0.5 rounded ${isNewDiscovery  'bg-emerald-500 text-slate-950'  'bg-slate-800 text-slate-300'}
+                            ${isNewDiscovery  '★ NEW!'  `Owned x${totalOwned}`}
+                        span
+                    div
+
+                    div class=my-auto flex flex-col items-center justify-center py-4
+                        div class=w-24 h-24 rounded-2xl bg-slate-90090 border ${rMeta.border} flex items-center justify-center mb-4 shadow-inner
+                            i class=fa-solid ${card.icon  'fa-star'} text-4xl ${rMeta.color}i
+                        div
+                        span class=text-[10px] font-mono uppercase tracking-widest text-slate-400${escapeHtml(card.deck)}span
+                        h3 class=text-base font-extrabold text-white mt-1 leading-snug${escapeHtml(card.title)}h3
+                        p class=text-xs text-slate-300 mt-2 leading-relaxed italic${escapeHtml(card.flavor)}p
+                    div
+
+                    div class=pt-2 border-t border-slate-80080 flex items-center justify-between text-[10px] font-mono text-slate-400
+                        spanENGIQUEST SERIES 1span
+                        span#${escapeHtml(card.id.toUpperCase())}span
+                    div
+                div
+            `;
+
+            setTimeout(() = {
+                inner.classList.add('card-flipped');
+                if (card.rarity === 'Legendary'  card.rarity === 'Epic'  card.rarity === 'Rare') {
+                    playSound('gacha-epic');
+                } else {
+                    playSound('win');
+                }
+                status.innerHTML = `
+                    You pulled strong class=${rMeta.color}${escapeHtml(card.title)}strong (${card.rarity})!
+                    ${isNewDiscovery  'span class=text-emerald-400 font-bold ml-1Added to your Collection Binder!span'  `span class=text-slate-400 ml-1(Duplicate #${totalOwned})span`}
+                `;
+            }, 180);
+        }
+
+        window.flipRevealedCard = function() {
+            const inner = document.getElementById('gachaCardInner');
+            inner.classList.toggle('card-flipped');
+        };
+
+         ==========================================
+         7. UI RENDERERS
+         ==========================================
+        window.switchMainTab = function(tabId) {
+            activeTab = tabId;
+            const tabs = ['quests', 'pack-opening', 'binder', 'deck-studio'];
+            tabs.forEach(t = {
+                const panel = document.getElementById(`tabPanel-${t}`);
+                const btn = document.getElementById(`tabBtn-${t}`);
+                if (panel) panel.classList.toggle('hidden', t !== tabId);
+                if (btn) {
+                    if (t === tabId) {
+                        btn.className = tab-nav-btn px-4 py-2 rounded-xl text-xs smtext-sm font-bold transition flex items-center gap-2 bg-indigo-600 text-white shadow-lg shadow-indigo-60025 shrink-0;
+                    } else {
+                        btn.className = tab-nav-btn px-4 py-2 rounded-xl text-xs smtext-sm font-bold transition flex items-center gap-2 bg-slate-900 text-slate-400 hovertext-white border border-slate-800 shrink-0;
+                    }
+                }
+            });
+            renderAll();
+        };
+
+        window.selectFormTier = function(tierNum) {
+            [1, 2, 3].forEach(t = {
+                const card = document.getElementById(`tierCard-${t}`);
+                const radio = card.querySelector('input[type=radio]');
+                radio.checked = (t === tierNum);
+                if (t === tierNum) {
+                    const borderColors = { 1 'border-emerald-500 bg-emerald-50010', 2 'border-cyan-500 bg-cyan-50010', 3 'border-amber-500 bg-amber-50010' };
+                    card.className = `cursor-pointer rounded-xl p-3 border-2 ${borderColors[t]} transition flex flex-col justify-between`;
+                } else {
+                    card.className = `cursor-pointer rounded-xl p-3 border-2 border-slate-800 bg-slate-95080 hoverborder-slate-700 transition flex flex-col justify-between`;
+                }
+            });
+        };
+
+        function renderHeader() {
+            const pts = appState.availablePoints;
+            const packsReady = Math.floor(pts  100);
+            const remainder = pts % 100;
+            const uniqueCollected = Object.keys(appState.collectedCards).filter(id = appState.collectedCards[id]  0).length;
+            const totalCards = appState.cards.length;
+            const collectorLevel = Math.floor(appState.lifetimePoints  150) + 1;
+
+            document.getElementById('collectorRankBadge').textContent = `LVL ${collectorLevel}`;
+            document.getElementById('packProgressText').textContent = remainder;
+            document.getElementById('packsReadyPill').textContent = `${packsReady} ${packsReady === 1  'Pack'  'Packs'} Ready`;
+            document.getElementById('packProgressBar').style.width = `${packsReady  0  100  remainder}%`;
+
+            document.getElementById('availablePointsHeader').textContent = `${pts.toLocaleString()} PTS`;
+            document.getElementById('binderCountHeader').textContent = `${uniqueCollected}  ${totalCards}`;
+            document.getElementById('headerPackBadge').textContent = packsReady;
+        }
+
+        window.renderActiveQuests = function() {
+            const listEl = document.getElementById('activeQuestsList');
+            const courseFilter = document.getElementById('filterCourse').value;
+            const tierFilter = document.getElementById('filterTier').value;
+
+            const filtered = appState.quests.filter(q = {
+                const matchCourse = courseFilter === 'ALL'  q.course === courseFilter;
+                const matchTier = tierFilter === 'ALL'  String(q.tier) === String(tierFilter);
+                return matchCourse && matchTier;
+            });
+
+            document.getElementById('activeQuestCount').textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    div class=text-center py-8 px-4 rounded-xl border border-dashed border-slate-800 bg-slate-95040 text-xs text-slate-400
+                        No active assignments match this filter. Add a new assignment above!
+                    div
+                `;
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(quest = {
+                const courseStyle = COURSE_STYLES[quest.course]  COURSE_STYLES[General];
+                const tierInfo = WHEEL_TIERS[quest.tier]  WHEEL_TIERS[1];
+                const isQueued = queuedQuestForSpin && queuedQuestForSpin.id === quest.id;
+
+                return `
+                    div class=bg-slate-95090 border ${isQueued  'border-amber-400 ring-1 ring-amber-40050'  'border-slate-800'} rounded-xl p-4 flex flex-col smflex-row smitems-center justify-between gap-3 transition hoverborder-slate-700
+                        div class=space-y-1.5 min-w-0
+                            div class=flex flex-wrap items-center gap-2
+                                span class=text-[11px] font-mono font-semibold px-2 py-0.5 rounded border ${courseStyle}
+                                    ${escapeHtml(quest.course)}
+                                span
+                                span class=text-[11px] font-mono font-bold px-2 py-0.5 rounded border ${tierInfo.badgeClass}
+                                    i class=fa-solid fa-dharmachakra mr-1i${tierInfo.shortName}
+                                span
+                                span class=text-[11px] text-slate-400
+                                    i class=fa-regular fa-calendar mr-1iDue ${escapeHtml(quest.dueDate  'Soon')}
+                                span
+                            div
+                            h3 class=text-sm smtext-base font-bold text-white truncate${escapeHtml(quest.title)}h3
+                        div
+
+                        div class=flex items-center justify-end gap-2 shrink-0
+                            button onclick=queueQuestSpin('${quest.id}')
+                                class=px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hoverfrom-emerald-500 hoverto-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-60020 activescale-95 transition flex items-center gap-1.5
+                                i class=fa-solid fa-dharmachakrai
+                                spanComplete & Spin (${tierInfo.min}–${tierInfo.max})span
+                            button
+                            button onclick=deleteActiveQuest('${quest.id}') title=Remove Assignment
+                                class=p-2 rounded-xl bg-slate-900 hoverbg-rose-50015 text-slate-500 hovertext-rose-400 border border-slate-800 transition
+                                i class=fa-regular fa-trash-can text-xsi
+                            button
+                        div
+                    div
+                `;
+            }).join('');
+        };
+
+        function renderCompletedHistory() {
+            const listEl = document.getElementById('completedHistoryList');
+            if (appState.completedHistory.length === 0) {
+                listEl.innerHTML = `div class=text-center py-4 text-xs text-slate-500No wheel spins or card pulls logged yet.div`;
+                return;
+            }
+
+            listEl.innerHTML = appState.completedHistory.map(item = {
+                if (item.kind === 'CARD') {
+                    return `
+                        div class=bg-slate-95060 border border-slate-80080 rounded-xl px-3.5 py-2 flex items-center justify-between text-xs
+                            div class=flex items-center gap-2.5 truncate
+                                i class=fa-solid fa-wand-magic-sparkles text-pink-400i
+                                span class=text-slate-200 font-medium truncate${escapeHtml(item.title)}span
+                            div
+                            span class=font-mono font-bold text-pink-400 shrink-0-100 PTSspan
+                        div
+                    `;
+                }
+                return `
+                    div class=bg-slate-95060 border border-slate-80080 rounded-xl px-3.5 py-2 flex items-center justify-between text-xs
+                        div class=flex items-center gap-2.5 truncate
+                            i class=fa-solid fa-dharmachakra text-emerald-400i
+                            span class=text-slate-200 font-medium truncate${escapeHtml(item.title)}span
+                        div
+                        span class=font-mono font-bold text-emerald-400 shrink-0+${item.points} PTSspan
+                    div
+                `;
+            }).join('');
+        }
+
+        function renderPackOpeningTab() {
+            const decks = getAllDeckNames();
+            const selectorList = document.getElementById('packDeckSelectorList');
+            const selected = appState.selectedPackDeck  'ALL';
+
+            const allOptions = [
+                { id 'ALL', name 'All-Access Master Deck', subtitle `All ${appState.cards.length} cards across every category`, icon 'fa-layer-group' },
+                ...decks.map(d = {
+                    const count = appState.cards.filter(c = c.deck === d).length;
+                    return { id d, name d, subtitle `${count} cards in deck`, icon 'fa-clone' };
+                })
+            ];
+
+            selectorList.innerHTML = allOptions.map(opt = {
+                const isSelected = selected === opt.id;
+                return `
+                    div onclick=selectPackDeck('${escapeHtml(opt.id)}')
+                        class=cursor-pointer rounded-xl p-3 border transition flex items-center justify-between ${
+                            isSelected  'bg-indigo-50015 border-indigo-400 text-white'  'bg-slate-950 border-slate-800 text-slate-300 hoverborder-slate-700'
+                        }
+                        div class=flex items-center gap-3
+                            div class=w-8 h-8 rounded-lg ${isSelected  'bg-indigo-500 text-white'  'bg-slate-900 text-slate-400'} flex items-center justify-center text-xs
+                                i class=fa-solid ${opt.icon}i
+                            div
+                            div
+                                div class=text-xs smtext-sm font-bold${escapeHtml(opt.name)}div
+                                div class=text-[11px] text-slate-400${escapeHtml(opt.subtitle)}div
+                            div
+                        div
+                        i class=fa-solid ${isSelected  'fa-circle-check text-indigo-400'  'fa-circle text-slate-800'}i
+                    div
+                `;
+            }).join('');
+
+             Render Odds Summary
+            const weights = appState.rarityWeights;
+            const totalW = Object.values(weights).reduce((a, b) = a + Number(b  0), 0)  100;
+            const oddsRow = document.getElementById('packOddsSummaryRow');
+            oddsRow.innerHTML = Object.entries(weights).map(([rarity, weight]) = {
+                const pct = ((Number(weight)  totalW)  100).toFixed(1).replace('.0', '');
+                const rMeta = RARITY_META[rarity]  RARITY_META.Common;
+                return `
+                    div class=p-1.5 rounded-lg bg-slate-900 border border-slate-800
+                        div class=text-[10px] font-bold ${rMeta.color}${rarity}div
+                        div class=text-xs font-mono text-white mt-0.5${pct}%div
+                    div
+                `;
+            }).join('');
+
+            const coverLabel = document.getElementById('packCoverDeckName');
+            if (coverLabel) {
+                coverLabel.textContent = selected === 'ALL'  'All-Access Master Deck'  selected;
+            }
+        }
+
+        window.selectPackDeck = function(deckName) {
+            appState.selectedPackDeck = deckName;
+            saveState();
+            renderPackOpeningTab();
+        };
+
+        window.renderCardBinder = function() {
+            const decks = getAllDeckNames();
+            const deckSelect = document.getElementById('binderFilterDeck');
+            const currentDeckFilter = deckSelect.value  'ALL';
+            const currentRarityFilter = document.getElementById('binderFilterRarity').value  'ALL';
+
+             Populate deck dropdown preserving selection
+            deckSelect.innerHTML = `option value=ALLAll Decks (${appState.cards.length})option` +
+                decks.map(d = `option value=${escapeHtml(d)} ${d === currentDeckFilter  'selected'  ''}${escapeHtml(d)}option`).join('');
+
+             Render per-deck completion bars
+            const barsContainer = document.getElementById('deckCompletionBars');
+            barsContainer.innerHTML = decks.map(deck = {
+                const cardsInDeck = appState.cards.filter(c = c.deck === deck);
+                const collectedInDeck = cardsInDeck.filter(c = (appState.collectedCards[c.id]  0)  0).length;
+                const pct = cardsInDeck.length  Math.round((collectedInDeck  cardsInDeck.length)  100)  0;
+                return `
+                    div class=p-3 rounded-xl bg-slate-950 border border-slate-800
+                        div class=flex justify-between items-center text-xs mb-1.5
+                            span class=font-bold text-slate-200 truncate pr-2${escapeHtml(deck)}span
+                            span class=font-mono text-cyan-400 font-bold shrink-0${collectedInDeck}${cardsInDeck.length}span
+                        div
+                        div class=w-full h-2 bg-slate-900 rounded-full overflow-hidden
+                            div class=h-full bg-gradient-to-r from-indigo-500 to-cyan-400 rounded-full transition-all duration-500 style=width ${pct}%div
+                        div
+                    div
+                `;
+            }).join('');
+
+             Filter cards for binder grid
+            const filteredCards = appState.cards.filter(c = {
+                const mDeck = currentDeckFilter === 'ALL'  c.deck === currentDeckFilter;
+                const mRarity = currentRarityFilter === 'ALL'  c.rarity === currentRarityFilter;
+                return mDeck && mRarity;
+            });
+
+            const grid = document.getElementById('binderCardsGrid');
+            grid.innerHTML = filteredCards.map(card = {
+                const count = appState.collectedCards[card.id]  0;
+                const isCollected = count  0;
+                const rMeta = RARITY_META[card.rarity]  RARITY_META.Common;
+
+                if (!isCollected) {
+                     Locked Mystery Card Silhouette
+                    return `
+                        div class=rounded-2xl bg-slate-95060 border border-dashed border-slate-800 p-4 flex flex-col justify-between min-h-[250px] opacity-75
+                            div class=flex items-center justify-between
+                                span class=text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-slate-900 text-slate-500 border border-slate-800
+                                    ${escapeHtml(card.rarity)}
+                                span
+                                span class=text-[10px] font-mono text-slate-600i class=fa-solid fa-lock mr-1iLockedspan
+                            div
+                            div class=my-auto text-center py-6
+                                div class=w-14 h-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto mb-3 text-slate-700
+                                    i class=fa-solid fa-question text-2xli
+                                div
+                                div class=text-[10px] font-mono uppercase text-slate-500${escapeHtml(card.deck)}div
+                                div class=text-sm font-bold text-slate-500 mt-1 Uncollected Carddiv
+                            div
+                            div class=text-[10px] font-mono text-slate-600 text-center pt-2 border-t border-slate-900
+                                Pull from ${escapeHtml(card.deck)} Deck
+                            div
+                        div
+                    `;
+                }
+
+                const isLegendary = card.rarity === 'Legendary';
+                return `
+                    div class=collectible-card rounded-2xl ${isLegendary  'rarity-legendary-card p-0.5'  `${rMeta.bg} border-2 ${rMeta.border} p-4`} ${rMeta.glow} min-h-[250px] flex flex-col justify-between
+                        div class=${isLegendary  'w-full h-full bg-slate-95095 rounded-[14px] p-4 flex flex-col justify-between'  'w-full h-full flex flex-col justify-between'}
+                            div class=flex items-center justify-between
+                                span class=text-[10px] font-mono uppercase px-2 py-0.5 rounded ${rMeta.badge}
+                                    ${escapeHtml(card.rarity)}
+                                span
+                                span class=text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-90090 text-amber-400 border border-slate-700
+                                    x${count}
+                                span
+                            div
+
+                            div class=my-auto text-center py-4
+                                div class=w-16 h-16 rounded-2xl bg-slate-900 border ${rMeta.border} flex items-center justify-center mx-auto mb-3 shadow-inner
+                                    i class=fa-solid ${card.icon  'fa-star'} text-2xl ${rMeta.color}i
+                                div
+                                div class=text-[10px] font-mono uppercase tracking-wider text-slate-400${escapeHtml(card.deck)}div
+                                h4 class=text-sm font-extrabold text-white mt-1${escapeHtml(card.title)}h4
+                                p class=text-xs text-slate-300 mt-1.5 italic leading-relaxed${escapeHtml(card.flavor)}p
+                            div
+
+                            div class=pt-2 border-t border-slate-80080 flex justify-between items-center text-[10px] font-mono text-slate-500
+                                spanCOLLECTEDspan
+                                span#${escapeHtml(card.id.toUpperCase())}span
+                            div
+                        div
+                    div
+                `;
+            }).join('');
+        };
+
+        function renderDeckStudio() {
+            const container = document.getElementById('rarityWeightsForm');
+            const weights = appState.rarityWeights;
+            const total = Object.values(weights).reduce((a, b) = a + Number(b  0), 0)  100;
+
+            container.innerHTML = Object.entries(weights).map(([rarity, val]) = {
+                const pct = ((Number(val)  total)  100).toFixed(1);
+                const rMeta = RARITY_META[rarity]  RARITY_META.Common;
+                return `
+                    div class=p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-4
+                        div
+                            span class=text-xs font-bold ${rMeta.color}${rarity}span
+                            div class=text-[11px] text-slate-500Effective Drop Chance strong class=text-slate-300 font-mono${pct}%strongdiv
+                        div
+                        div class=flex items-center gap-2
+                            input type=number min=0 max=1000 value=${val}
+                                onchange=updateRarityWeight('${rarity}', this.value)
+                                class=w-20 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-white text-right outline-none focusborder-indigo-500
+                            span class=text-xs text-slate-500 font-monowtspan
+                        div
+                    div
+                `;
+            }).join('');
+
+            const datalist = document.getElementById('existingDecksDatalist');
+            if (datalist) {
+                datalist.innerHTML = getAllDeckNames().map(d = `option value=${escapeHtml(d)}`).join('');
+            }
+        }
+
+        window.updateRarityWeight = function(rarity, newVal) {
+            appState.rarityWeights[rarity] = Math.max(0, Number(newVal)  0);
+            saveState();
+            renderDeckStudio();
+            renderPackOpeningTab();
+        };
+
+        window.resetDefaultWeights = function() {
+            appState.rarityWeights = { Common 50, Uncommon 28, Rare 14, Epic 6, Legendary 2 };
+            saveState();
+            renderDeckStudio();
+            renderPackOpeningTab();
+            showToast('Rarity weights restored to defaults', 'fa-sliders', 'text-indigo-400');
+        };
+
+        window.handleAddCustomCard = function(event) {
+            event.preventDefault();
+            const title = document.getElementById('customCardTitle').value.trim();
+            const deck = document.getElementById('customCardDeck').value.trim();
+            const rarity = document.getElementById('customCardRarity').value;
+            const icon = document.getElementById('customCardIcon').value;
+            const flavor = document.getElementById('customCardFlavor').value.trim();
+
+            if (!title  !deck) return;
+
+            const newCard = {
+                id 'c-cust-' + Date.now().toString().slice(-4),
+                title,
+                deck,
+                rarity,
+                icon,
+                flavor flavor  'Custom collectible card.'
+            };
+
+            appState.cards.push(newCard);
+            saveState();
+            renderAll();
+
+            document.getElementById('customCardTitle').value = '';
+            document.getElementById('customCardFlavor').value = '';
+            showToast(`Added ${title} (${rarity}) to ${deck}!`, 'fa-layer-group', 'text-emerald-400');
+        };
+
+         ==========================================
+         8. FORM & CRUD HANDLERS
+         ==========================================
+        window.handleAddQuest = function(event) {
+            event.preventDefault();
+            const titleInput = document.getElementById('questTitle');
+            const courseInput = document.getElementById('questCourse');
+            const dueInput = document.getElementById('questDueDate');
+            const checkedTier = document.querySelector('input[name=questTier]checked');
+            const tier = checkedTier  Number(checkedTier.value)  1;
+
+            const title = titleInput.value.trim();
+            if (!title) return;
+
+            appState.quests.unshift({
+                id 'q-' + Date.now(),
+                title,
+                course courseInput.value,
+                tier,
+                dueDate dueInput.value
+            });
+
+            saveState();
+            renderAll();
+            titleInput.value = '';
+            showToast(`Added ${title} (${WHEEL_TIERS[tier].shortName})`, 'fa-plus-circle', 'text-cyan-400');
+        };
+
+        window.deleteActiveQuest = function(questId) {
+            if (queuedQuestForSpin && queuedQuestForSpin.id === questId) {
+                queuedQuestForSpin = null;
+            }
+            appState.quests = appState.quests.filter(q = q.id !== questId);
+            saveState();
+            renderAll();
+        };
+
+        window.clearCompletedHistory = function() {
+            appState.completedHistory = [];
+            saveState();
+            renderCompletedHistory();
+        };
+
+        window.toggleSound = function() {
+            appState.soundEnabled = !appState.soundEnabled;
+            saveState();
+            const iconClass = appState.soundEnabled  'fa-solid fa-volume-high text-sm'  'fa-solid fa-volume-xmark text-sm text-slate-600';
+            document.getElementById('soundToggleDesktop').innerHTML = `i class=${iconClass}i`;
+            document.getElementById('soundToggleMobile').innerHTML = `i class=${iconClass}i`;
+        };
+
+         ==========================================
+         9. EXPORT  IMPORT BACKUP & MODALS
+         ==========================================
+        window.openBackupModal = function() {
+            const m = document.getElementById('backupModal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        };
+
+        window.closeBackupModal = function() {
+            const m = document.getElementById('backupModal');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        };
+
+        window.exportSaveJson = function() {
+            const dataStr = datatextjson;charset=utf-8, + encodeURIComponent(JSON.stringify(appState, null, 2));
+            const a = document.createElement('a');
+            a.setAttribute('href', dataStr);
+            a.setAttribute('download', `engiquest_save_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            showToast('Backup JSON downloaded!', 'fa-download', 'text-cyan-400');
+        };
+
+        window.importSaveJson = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    appState = { ...getDefaultState(), ...imported };
+                    saveState();
+                    renderAll();
+                    closeBackupModal();
+                    showToast('Backup restored successfully!', 'fa-circle-check', 'text-emerald-400');
+                } catch (err) {
+                    showToast('Invalid JSON backup file.', 'fa-triangle-exclamation', 'text-rose-400');
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        window.openResetModal = function() {
+            const m = document.getElementById('resetModal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        };
+
+        window.closeResetModal = function() {
+            const m = document.getElementById('resetModal');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        };
+
+        window.confirmResetData = function() {
+            appState = getDefaultState();
+            queuedQuestForSpin = null;
+            saveState();
+            renderAll();
+            closeResetModal();
+            showToast('Reset to starter assignments & decks', 'fa-rotate-right', 'text-cyan-400');
+        };
+
+         ==========================================
+         10. VISUAL HELPERS & INITIALIZATION
+         ==========================================
+        function spawnFloatingText(event, text, colorClass = 'text-amber-400') {
+            const el = document.createElement('div');
+            el.className = `floating-xp font-mono font-extrabold text-base smtext-lg drop-shadow-md ${colorClass}`;
+            el.innerHTML = text;
+
+            let x = window.innerWidth  2;
+            let y = window.innerHeight  2;
+            if (event && event.clientX && event.clientY) {
+                x = event.clientX - 25;
+                y = event.clientY - 15;
+            }
+            el.style.left = `${Math.max(16, Math.min(window.innerWidth - 120, x))}px`;
+            el.style.top = `${Math.max(16, y)}px`;
+            document.body.appendChild(el);
+            setTimeout(() = el.remove(), 1300);
+        }
+
+        function showToast(message, icon = 'fa-circle-check', colorClass = 'text-emerald-400') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'pointer-events-auto flex items-center gap-3 bg-slate-90095 backdrop-blur-md border border-slate-700 rounded-xl px-4 py-3 shadow-2xl text-xs smtext-sm text-white transition-all duration-300';
+            toast.innerHTML = `
+                i class=fa-solid ${icon} ${colorClass} text-basei
+                span class=font-medium${message}span
+            `;
+            container.appendChild(toast);
+            setTimeout(() = {
+                toast.classList.add('opacity-0');
+                setTimeout(() = toast.remove(), 300);
+            }, 3200);
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(&g, '&amp;')
+                .replace(g, '&lt;')
+                .replace(g, '&gt;')
+                .replace(g, '&quot;')
+                .replace('g, '&#039;');
+        }
+
+        function renderAll() {
+            renderHeader();
+            renderActiveQuests();
+            renderCompletedHistory();
+            updateSpinActionLabels();
+            drawRouletteWheel();
+            renderPackOpeningTab();
+            renderCardBinder();
+            renderDeckStudio();
+        }
+
+        window.addEventListener('DOMContentLoaded', () = {
+            document.getElementById('questDueDate').value = getRelativeDate(2);
+            renderAll();
+            initCloudPersistence();
+        });
+    script
+body
+html
